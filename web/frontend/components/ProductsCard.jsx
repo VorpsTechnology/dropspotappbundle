@@ -213,11 +213,11 @@ useEffect(async()=>{
   const skuCheck=async()=>{
     for(let i=0;i<orders.length;i++){
       console.log("sku",orders[i].line_items[0].sku);
-      const {data}=await axios.post("http://localhost:5000/list/checksku",{sku:orders[i].line_items[0].sku})
+      const {data}=await axios.post("https://server.dropspot.in/list/checksku",{sku:orders[i].line_items[0].sku})
     
       console.log("resp",data);
       if(data){
-        const {data}=await axios.post("http://localhost:5000/list/checkorder",{shopifyOrderId:orders[i].id}) 
+        const {data}=await axios.post("https://server.dropspot.in/list/checkorder",{shopifyOrderId:orders[i].id}) 
         if(data){
           const check=[...checkedOrders,orders[i]]
           const uniqueOrders=[...new Set(check)]
@@ -276,7 +276,7 @@ const exportorder=async(e)=>{
        OrderStatus:"ORDERED"
      }
      console.log(ata);
-     const tata= await axios.post("http://localhost:5000/order/create",ata)
+     const tata= await axios.post("https://server.dropspot.in/order/create",ata)
      if(tata){
     //  swal("Ordered Successfully...!")
     //  history.push("/SellerOrderFullfillment")
