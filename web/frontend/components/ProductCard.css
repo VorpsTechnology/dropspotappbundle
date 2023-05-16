@@ -1,0 +1,128 @@
+.inputbox{
+    background-color:rgba(239,239,293,1);
+    width:530px;
+    height:45.44px;
+    top: 223px;
+    border-radius:5px; border-color:transparent;
+    outline-color: rgba(255, 214, 0, 1); 
+    margin: 10px 0px 10px 0px;
+    
+    }
+
+    .Export button{
+        background-color:rgba(255, 214, 0, 1);  
+        border-color: transparent;
+        padding: 10px;
+        font-size: 15px;
+        font-weight: 600;
+        border-radius: 5px;
+        width: 150px;
+    }
+    .tabbtn3 {
+        background-color: black;
+      color:white;
+        border-color: transparent;
+        width: auto;
+        padding: 10px;
+        font-weight: 800;
+        height: 50px;
+        align-items: center;
+        border-radius: 10px;
+        margin: 15px 5px 15px 5px;
+        box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.15);
+      }
+      .selected-tab1 {
+        background-color: #fde31a;
+        color: black;
+        border-color: transparent;
+        border-width:0.2px;
+        box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.15);
+        
+      }
+      #tabcontainer {
+        background: #ffffff;
+        border: 0.1px  rgba(0, 0, 0, 0.25);
+        box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.15);
+        border-radius: 27px;
+      }      
+    .submitbtn{
+    background-color:rgba(255, 214, 0, 1);
+    font-size: 15px; 
+    font-weight: 650; 
+    font-weight: 400; 
+    color:black;
+    margin: 20px 0px 0px 0px;
+    width: 120px;
+    border-radius: 20px;
+    padding: 10px;
+    border-color: transparent;
+    
+    }
+
+    .formcontainer{
+        padding: 40px;
+        align-items: center;
+    }
+
+    .label{
+        margin: 20px 0px 20px 0px;
+        text-align: left;
+        font-weight: 500;
+    }
+
+    .login{
+        font-weight: 650;
+        font-size: 18px;
+        padding: 20px;
+    }
+
+    .listbtn{
+        background-color:rgba(255, 214, 0, 1);
+        border-color: transparent;
+        width: 100px;
+        font-weight: 650;
+        font-size: 15px;
+    }
+    .table{
+  border-color: transparent;
+  width: auto;
+    }
+table tr th{
+    width: 150px;
+    padding:10px;
+    margin: 10px;
+}
+    .tablehead{
+        background-color:rgba(255, 214, 0, 1);
+        padding: 30px; 
+    }
+
+    @media only screen and (max-width: 600px)  {
+        .inputbox{
+            background-color:rgba(239,239,293,1);
+            width:250px;
+            height:45.44px;
+            top: 223px;
+            border-radius:5px; border-color:transparent;
+            outline-color: rgba(255, 214, 0, 1); 
+            margin: 10px 0px 10px 0px;
+            
+            }  
+    }
+    @media(max-width: 300px){
+        .inputbox{
+            background-color:rgba(239,239,293,1);
+            width:250px;
+            height:45.44px;
+            top: 223px;
+            border-radius:5px; border-color:transparent;
+            outline-color: rgba(255, 214, 0, 1); 
+            margin: 10px 0px 10px 0px;
+            
+            }  
+            table tr th{
+                width: auto;
+                padding:10px;
+                margin: 10px;
+            }
+    }
