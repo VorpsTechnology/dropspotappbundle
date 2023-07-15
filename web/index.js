@@ -6,7 +6,7 @@ import serveStatic from "serve-static";
 
 import shopify from "./shopify.js";
 import productCreator from "./product-creator.js";
-import GDPRWebhookHandlers from "./gdpr.js";
+import GDPRWebhookHandlers from "./gdpr.js";  
 import { Session } from "inspector";
 
 const PORT = parseInt(
@@ -17,9 +17,9 @@ const PORT = parseInt(
 const STATIC_PATH =
   process.env.NODE_ENV === "production"
     ? `${process.cwd()}/frontend/dist`
-    : `${process.cwd()}/frontend/`;
+    : `${process.cwd()}/frontend/`;       
 
-const app = express();
+const app = express();    
 
 // Set up Shopify authentication and webhook handling
 app.get(shopify.config.auth.path, shopify.auth.begin());
@@ -27,6 +27,7 @@ app.get(
   shopify.config.auth.callbackPath,
   shopify.auth.callback(),
   shopify.redirectToShopifyOrAppRoot()
+
 );
 app.post(
   shopify.config.webhooks.path,
@@ -68,7 +69,7 @@ app.get("/api/orders",async(req,res)=>{
     const response=
     await shopify.api.rest.Order.all({
       session: res.locals.shopify.session,
-      status: "any",
+      status: "any", 
     }); 
     res.status(200).json(response)
   } catch (error) {
@@ -77,7 +78,34 @@ app.get("/api/orders",async(req,res)=>{
 })  
 
 //................................
+//.............update order............
+app.put("/api/orders/:orderid",async(req,res)=>{
+  try {
+ 
+const order = new shopify.api.rest.Order({session:res.locals.shopify.session});
+order.id = parseInt(req.params.orderid);
+console.log("order",order);
+console.log("order req",req.body);
 
+order.total_shipping_price_set={
+  presentment_money:{
+    amount:req.body.shipingCharge
+  }
+  }
+
+
+console.log("fir");
+const response=await order.save({
+  update: true,
+});
+console.log("sec",response);
+res.status(200).json(response)
+  } catch (error) {
+    console.log("error",error);
+    res.status(500).send(error)
+  }
+})  
+//.............update order............
 app.post("/api/products/create", async (_req, res) => {
   let status = 200;
   let error = null;
@@ -102,5 +130,5 @@ app.use("/*", shopify.ensureInstalledOnShop(), async (_req, res, _next) => {
     .send(readFileSync(join(STATIC_PATH, "index.html")));
 });
 
-app.listen(PORT);
- 
+app.listen(PORT);   
+      

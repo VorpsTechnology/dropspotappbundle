@@ -93,13 +93,33 @@ export default async function productCreator(
         data: {
           query: CREATE_PRODUCTS_MUTATION,
           variables: {
-            input: {
-           
-              title: data[i].name,
-              
+            "input": {
+              "id":data[i]._id,
+              "title": data[i].name,
+              "vendor": data[i].sellerId,
              
-               
-              variants: [{ price: data[i].price ,sku:data[i].sku}],
+              "images": [
+                {
+                  "altText": "",
+                  
+                	"src": `https://server.dropspot.in/images/${data[i].image0}`
+                },
+                {
+                  "altText": "",
+                  
+                	"src": `https://server.dropspot.in/images/${data[i].image1}`
+                },
+                {
+                  "altText": "",
+                  
+                	"src": `https://server.dropspot.in/images/${data[i].image2}`
+                }
+              ],
+              "variants": [{ "price": data[i].dropshipperPrice ,"sku":data[i].sku ,
+                "title":data[i]._id} ],
+                "options": [
+                  data[i]._id
+                ],
              
             },
           },

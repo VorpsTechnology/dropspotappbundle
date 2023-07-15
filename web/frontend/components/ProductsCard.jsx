@@ -12,7 +12,9 @@ export function ProductsCard() {
   const emptyToastProps = { content: null };
   const [isLoading, setIsLoading] = useState(true);
   const [toastProps, setToastProps] = useState(emptyToastProps);
+  
   const fetch = useAuthenticatedFetch();
+  console.log("fetch",fetch);
   const list={
     backgroundColor:'#FFE51A',
     borderColor:'transparent',
@@ -54,12 +56,19 @@ fetchOrders()
   const navigate=useNavigate()
   //useeffect for fetch products
   useEffect(() => {
-    
+    console.log(' hostname => ' +  window.location.href);
     async function fetchData() {
       // You can await here
-      const {data}=await axios.get("https://server.dropspot.in/product/getproducts/1")
-      setProduct(data)
-      console.log("fkk",data);
+      //const {data}=await axios.get("https://server.dropspot.in/product/getproducts/1")
+      const userId=sessionStorage.getItem("userId")
+     if(userId){
+      const {data}=await axios.get(`http://localhost:5007/user/${userId}`)
+      setProduct(data.beforeListing)
+      console.log("fkk",data.beforeListing);
+     }else{
+      alert()
+     }
+      
       // ...
     }
     fetchData()
@@ -85,16 +94,27 @@ fetchOrders()
   );
 
   const handlePopulate = async () => {
-  
+  console.log("populate data",product);
+ 
     const reqOptions={
       method:"POST",
       headers:{'content-type':'application/json'},
-      body:JSON.stringify({data:product})
+      body:JSON.stringify({data:product})  
     }
     const response = await fetch("/api/products/create",reqOptions);
 
     if (response.ok) {
+      const userId=sessionStorage.getItem("userId")
       await refetchProductCount();
+    product.forEach(async(element)=>{
+      const ata={
+        dropshipperId:userId,
+        product:element
+      }
+      const {data}=await axios.post("http://localhost:5007/list/addafterListingArray",ata);
+      console.log("products added to after listing array")
+    })
+       
       setToastProps({ content: "products imported!" });
     } else {
       setIsLoading(false);
@@ -137,8 +157,8 @@ fetchOrders()
    console.log("orders",orders)
    //..................Navigation......
    const handleLoginCard=()=>{
-      setLoginCard(false)
-      setProductCard(true)
+      setLoginCard(true)
+      setProductCard(false)
    }
 
 const handleProductCard=()=>{
@@ -177,7 +197,7 @@ const handleSubmit = async (e) => {
    setError2(true);
   } else {
     try {
-      const { data } = await axios.post("https://server.dropspot.in/auth/login",user);
+      const { data } = await axios.post("http://localhost:5007/auth/login",user);
       console.log(data);
       sessionStorage.setItem("userInfo", data.user);
       sessionStorage.setItem("userEmail", data.user.email);
@@ -185,6 +205,13 @@ const handleSubmit = async (e) => {
       sessionStorage.setItem("name", data.user.name);
       sessionStorage.setItem("accountType", data.user.accountType);
       sessionStorage.setItem("userId", data.user._id);
+      const urls=window.location.href
+      console.log(' hostname => ' +  window.location.href);
+      const meta={
+        dropshipperId:data.user._id,
+        urls:urls
+      }
+      await axios.post("http://localhost:5007/list/storeurl",meta)
       resetForm();
      handleProductCard()
     } catch (error) {
@@ -213,11 +240,11 @@ useEffect(async()=>{
   const skuCheck=async()=>{
     for(let i=0;i<orders.length;i++){
       console.log("sku",orders[i].line_items[0].sku);
-      const {data}=await axios.post("https://server.dropspot.in/list/checksku",{sku:orders[i].line_items[0].sku})
+      const {data}=await axios.post("http://localhost:5007/list/checksku",{sku:orders[i].line_items[0].sku})
     
       console.log("resp",data);
       if(data){
-        const {data}=await axios.post("https://server.dropspot.in/list/checkorder",{shopifyOrderId:orders[i].id}) 
+        const {data}=await axios.post("http://localhost:5007/list/checkorder",{shopifyOrderId:orders[i].id}) 
         if(data){
           const check=[...checkedOrders,orders[i]]
           const uniqueOrders=[...new Set(check)]
@@ -251,32 +278,79 @@ const exportorder=async(e)=>{
  
   if(userId && userInfo){
    for(let i=0;i<checkedOrders.length;i++){
+//shipping charge calculate
+// let shipingCharge;
+// const ataz ={
+//   "origin" : "122001", 
+//   "destination" : "122001", 
+//   "payment_type" : "cod", 
+//   "order_amount" : "999", 
+//   "weight" : "600", 
+//   "length" : "10", 
+//   "breadth" : "10", 
+//   "height" : "10" 
+// }
+// console.log("ataz",ataz);
+// const {data}=await axios.post("http://localhost:5007/shipping/shippingcalculator",ataz)
+// shipingCharge=data[0].freight_charges + data[0].cod_charges
+// console.log("shipingCharge",shipingCharge);
+// //shipping charge calculate end
+
+// //update Order change shippingCharge
+// const reqOpt={
+//   shippingPrice:shipingCharge
+// }
+
+// const reqOptions={
+//   method:"PUT",
+//   headers:{'content-type':'application/json'},
+//   body:JSON.stringify({data:reqOpt})  
+// }
+// console.log("checkedOrders[i].id",checkedOrders[i].id);
+// const response = await fetch(`/api/orders/${checkedOrders[i].id}`,reqOptions);
+// console.log("response",response);
+// if (response.ok) {
+//   console.log("resp",response);
+//   alert("shipping cgarge added succesfully")
+// }
+// else{
+//   alert("error occured")
+// }
+
+
+//update order shppingCharge
     const ata={
-      shopifyOrderId:checkedOrders[i].id,
-       productId:checkedOrders[i].line_items[0].id,
+     
+      productId:checkedOrders[i].line_items[0].id,
        productName:checkedOrders[i].line_items[0].name,
-       userId:userId,
-       quantity:checkedOrders[i].number,
+       shopifyOrderId:checkedOrders[i].id,
+       sellerId:checkedOrders[i].line_items[0].vendor,       
+       dropshipperId:userId,
+       type:"shopify",
+       sku:checkedOrders[i].line_items[0].sku,
+       quantity:checkedOrders[i].line_items[0].quantity,
        price:checkedOrders[i].total_price,
        deliveryAddress:{
-          firstName:address.firstName,
-          lastName:address.lastName,
-          mobile:address.mobile,
-          email:"ahazadarsh0014@gmail.com",
+          firstName:checkedOrders[i].billing_address.first_name,
+          // lastName:checkedOrders[i].address.lastName,
+          mobile:checkedOrders[i].billing_address.phone,
+          email:checkedOrders[i].billing_address.email,
           // state:stateCode,
           // city:cityCode,
-          post:address.zip,
-          address1:address.DAddress
+          post:checkedOrders[i].billing_address.zip,
+          address1:checkedOrders[i].billing_address.address1
   
        },
        orderType:"DROPSHIPPER",
        paymentMod:"COD",
+     
        PaymentStatus:"PENDING",
        DeliveryStatus:"PENDING",
-       OrderStatus:"ORDERED"
+       OrderStatus:"ORDERED",
+      
      }
      console.log(ata);
-     const tata= await axios.post("https://server.dropspot.in/order/create",ata)
+     const tata= await axios.post("http://localhost:5007/shoipifyorder/create",ata)
      if(tata){
     //  swal("Ordered Successfully...!")
     //  history.push("/SellerOrderFullfillment")
@@ -303,6 +377,8 @@ const exportorder=async(e)=>{
         sectioned
       
       >
+
+        
        
           <div >
 
@@ -385,9 +461,9 @@ const exportorder=async(e)=>{
              <thead className="tablehead">
              <tr  style={{color:"black",margin:'20px'}}>
                 <th style={{padding:'10px',width:'50px'}}>SELECT</th>
-                
-                <th>NAME</th>
                 <th>Image</th>
+                <th>NAME</th>
+               
                 <th>SKU ID</th>
 
                 <th>ACTIONS</th>
@@ -402,8 +478,9 @@ const exportorder=async(e)=>{
               <tr>
                 <td><input type="checkbox" name="" id="" /></td>
                 <td>image</td>
-              <td  style={{color:"black"}}>{ele.name}</td>
-              <td  style={{color:"black"}}>{ele._id}</td>
+              <td  style={{color:"black"}}>{ele.name }</td>
+              <td  style={{color:"black"}}>{ele.sku}</td>
+              
               <td>
                <div style={{display:'inline'}}>
                <div> <button style={list} >LIST</button></div>
